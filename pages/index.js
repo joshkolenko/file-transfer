@@ -1,12 +1,15 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import { Box, Button, Container, Heading, Text } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import App from '../components/App'
 
 export default function Home() {
+  const { isAuthenticated, loginWithPopup } = useAuth0()
+
   return (
     <App title="File Transfer">
       <Container maxW="container" pl="10rem" pt="3rem">
-        <Box sx={{}}>
+        <Box>
           <Text
             sx={{
               display: 'flex',
@@ -18,11 +21,11 @@ export default function Home() {
               svg: {
                 fill: 'black',
                 width: '2rem',
-                marginRight: '1rem'
-              }
+                marginRight: '1rem',
+              },
             }}
           >
-            <svg viewBox="0 0 38 14" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 38 14">
               <path fillRule="evenodd" clipRule="evenodd" d="M25 8H0V6H25V8Z" />
               <path
                 fillRule="evenodd"
@@ -39,7 +42,7 @@ export default function Home() {
             fontSize: '4.25rem',
             fontWeight: 500,
             maxWidth: '10em',
-            mt: '2.5rem'
+            mt: '2.5rem',
           }}
         >
           <Text as="span" borderBottom="0.075em solid black">
@@ -51,9 +54,15 @@ export default function Home() {
           </Text>{' '}
           in a matter of <strong>seconds</strong>.
         </Heading>
-        <Button as={NextLink} href="/upload" size="lg" mt="4rem">
-          Upload a file
-        </Button>
+        {isAuthenticated ? (
+          <Button as={NextLink} href="/upload" size="lg" mt="4rem">
+            Upload a file
+          </Button>
+        ) : (
+          <Button onClick={loginWithPopup} size="lg" mt="4rem">
+            Sign in to upload files
+          </Button>
+        )}
       </Container>
     </App>
   )
