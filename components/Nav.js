@@ -2,9 +2,12 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { Container, Button, Link, Box, Flex } from '@chakra-ui/react'
 
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 
 export default function Nav() {
-  const { user, isAuthenticated, loginWithPopup, logout } = useAuth0()
+  const { pathname } = useRouter()
+
+  const { isAuthenticated, loginWithPopup, logout } = useAuth0()
 
   return (
     <Box as="nav">
@@ -14,7 +17,7 @@ export default function Nav() {
         sx={{
           position: 'relative',
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <Link
@@ -23,7 +26,7 @@ export default function Nav() {
           sx={{
             fontSize: '1.2rem',
             fontWeight: 'bold',
-            marginRight: 'auto'
+            marginRight: 'auto',
           }}
         >
           file-transfer
@@ -37,20 +40,56 @@ export default function Nav() {
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 a: {
+                  position: 'relative',
                   fontWeight: 'bold',
-                  margin: '1rem'
-                }
+                  margin: '0 1rem',
+                  padding: '0.75rem 0',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    left: 0,
+                    bottom: 0,
+                    display: 'block',
+                    height: '2px',
+                    width: '0',
+                    background: 'black',
+                    transition: 'width 300ms ease',
+                  },
+                  '&:hover': {
+                    textDecor: 'none',
+                    '&::after': {
+                      width: '1.5rem',
+                    },
+                  },
+                  '&.active': {
+                    '&::after': {
+                      width: '2.5rem',
+                    },
+                  },
+                },
               }}
             >
-              <Link as={NextLink} href="/files">
+              <Link
+                as={NextLink}
+                className={pathname === '/upload' ? 'active' : ''}
+                href="/upload"
+              >
                 Upload a file
               </Link>
-              <Link as={NextLink} href="/files">
+              <Link
+                as={NextLink}
+                className={pathname === '/files' ? 'active' : ''}
+                href="/files"
+              >
                 My Files
               </Link>
-              <Link as={NextLink} href="/account">
+              {/* <Link
+                as={NextLink}
+                className={pathname === '/account' ? 'active' : ''}
+                href="/account"
+              >
                 Account
-              </Link>
+              </Link> */}
             </Flex>
             <Button
               onClick={() => logout({ returnTo: window.location.origin })}
