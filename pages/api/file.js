@@ -2,7 +2,7 @@ const {
   GridFSBucket,
   MongoClient,
   ServerApiVersion,
-  ObjectId
+  ObjectId,
 } = require('mongodb')
 
 const fs = require('fs')
@@ -11,11 +11,11 @@ const formidable = require('formidable')
 const client = new MongoClient(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverApi: ServerApiVersion.v1
+  serverApi: ServerApiVersion.v1,
 })
 
 const db = client.db('file-transfer')
-const bucket = new GridFSBucket(db, { bucketName: 'bucket' })
+const bucket = new GridFSBucket(db, { bucketName: 'uploads' })
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -34,15 +34,15 @@ export default async function handler(req, res) {
           bucket
             .openUploadStreamWithId(id, file.originalFilename, {
               metadata: {
-                userId
-              }
+                userId,
+              },
             })
             .on('finish', () => {
               res.status(200).json({
                 success: true,
                 message: 'File uploaded',
                 name: file.originalFilename,
-                id: id.toString()
+                id: id.toString(),
               })
             })
         )
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     try {
       const cursor = await bucket
         .find({
-          _id: ObjectId(req.query.id)
+          _id: ObjectId(req.query.id),
         })
         .toArray()
 
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       }
 
       if (req.query.type === 'data') {
-        res.send(data)
+        res.send({ ...data, name: data.filename, size: data.length })
       }
 
       if (req.query.type === 'download') {
@@ -92,6 +92,6 @@ export default async function handler(req, res) {
 export const config = {
   api: {
     responseLimit: false,
-    bodyParser: false
-  }
+    bodyParser: false,
+  },
 }
