@@ -2,15 +2,23 @@ import { useRef, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import Link from 'next/link'
+import { Box, Button, grid, Spinner } from '@chakra-ui/react'
+import File from './File'
+import { useRouter } from 'next/router'
 
 export default function Upload() {
   const { user } = useAuth0()
+  const router = useRouter()
+
+  const [isLoading, setIsLoading] = useState(false)
   const [file, setFile] = useState(null)
-  const [fileInfo, setFileInfo] = useState(null)
+
   const inputRef = useRef()
 
   const handleSubmit = async e => {
     e.preventDefault()
+
+    setIsLoading(true)
 
     const body = new FormData()
     body.append('file', file)
@@ -18,65 +26,61 @@ export default function Upload() {
 
     const response = await fetch('api/file', {
       method: 'POST',
-      body
+      body,
     }).then(res => res.json())
 
     if (response.success) {
-      setFileInfo({
-        ...response,
-        url: window.location.origin + '/file/' + response.id
-      })
+      router.push('/file/' + response.id)
+    } else {
+      setIsLoading(false)
     }
   }
 
-  const handleRemove = () => {
-    setFile(null)
-    inputRef.current.value = ''
+  if (isLoading) {
+    return <Spinner />
   }
 
-  const getFileSize = bytes => {
-    var i = bytes == 0 ? 0 : Math.floor(Math.log(bytes) / Math.log(1024))
+  if (!file) {
     return (
-      (bytes / Math.pow(1024, i)).toFixed(2) * 1 +
-      ' ' +
-      ['B', 'kB', 'MB', 'GB', 'TB'][i]
+      <Button as="label" size="lg">
+        Choose file
+        <input
+          type="file"
+          ref={inputRef}
+          onChange={e => setFile(e.target.files[0])}
+          style={{ display: 'none' }}
+        />
+      </Button>
     )
   }
 
   return (
-    <div>
-      <h1>Upload a file</h1>
-      <div>
-        {file ? (
-          <>
-            <p>
-              {file.name} ({getFileSize(file.size)})
-            </p>
-            <button onClick={handleRemove}>&times;</button>
-          </>
-        ) : (
-          <p>No file chosen</p>
-        )}
-      </div>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Choose file
+    <>
+      <File name={file.name} size={file.size} />
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 15rem)',
+          gap: '0.75rem',
+          mt: '2.5rem',
+          '.chakra-button': {
+            padding: 0,
+          },
+        }}
+      >
+        <Button as="label" size="lg" variant="secondary">
+          Choose new file
           <input
-            ref={inputRef}
             type="file"
-            onInput={e => {
-              setFile(e.target.files[0])
-            }}
+            ref={inputRef}
+            onChange={e => setFile(e.target.files[0])}
+            style={{ display: 'none' }}
           />
-        </label>
-        <button disabled={file ? false : true}>Submit</button>
-      </form>
-      {fileInfo ? (
-        <p>
-          File available at:
-          <Link href={fileInfo.url}>{fileInfo.url}</Link>
-        </p>
-      ) : null}
-    </div>
+        </Button>
+        <Button size="lg" onClick={handleSubmit}>
+          Upload file
+        </Button>
+      </Box>
+    </>
   )
 }
