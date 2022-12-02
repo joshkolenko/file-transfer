@@ -3,24 +3,32 @@ import { useRouter } from 'next/router'
 
 import Head from 'next/head'
 import Nav from './Nav'
+import { Box, Center, Spinner } from '@chakra-ui/react'
 
 export default function App({
   title = 'File Transfer',
   children,
-  requireAuth
+  loading,
+  requireAuth,
 }) {
-  const { user, isAuthenticated, isLoading } = useAuth0()
+  const { isAuthenticated, isLoading } = useAuth0()
   const router = useRouter()
 
-  console.log(user, isAuthenticated)
-
   const rendered = () => {
+    if (loading) {
+      return (
+        <Center h="20rem">
+          <Spinner />
+        </Center>
+      )
+    }
+
     if (requireAuth) {
       if (isLoading) {
         return (
-          <div>
-            <p>Loading...</p>
-          </div>
+          <Center h="20rem">
+            <Spinner />
+          </Center>
         )
       }
 
@@ -49,10 +57,10 @@ export default function App({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <Box as="main" minH="100vh">
         <Nav />
         {rendered()}
-      </main>
+      </Box>
     </>
   )
 }
