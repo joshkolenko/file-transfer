@@ -85,5 +85,3 @@ export const theme = extendTheme({
   space,
   styles,
 })
-
-console.log(theme)
