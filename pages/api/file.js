@@ -6,11 +6,11 @@ const {
 } = require('mongodb');
 
 export const config = {
-  runtime: 'edge',
-  // api: {
-  //   responseLimit: false,
-  //   bodyParser: false,
-  // },
+  runtime: 'experimental-edge',
+  api: {
+    responseLimit: false,
+    bodyParser: false,
+  },
 };
 
 const fs = require('fs');
