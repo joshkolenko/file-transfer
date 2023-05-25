@@ -1,45 +1,47 @@
-import NextLink from 'next/link'
-import File from '../components/File'
-import { Button, Spinner } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import NextLink from 'next/link';
+import File from '../components/File';
+import { Button, Spinner } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Download({ name, size, onLoad }) {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [hasError, setHasError] = useState(false)
-  const [file, setFile] = useState(null)
+  const [hasError, setHasError] = useState(false);
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     const getFileInfo = async () => {
+      if (!router.query.id) return;
+
       const response = await fetch(
         `/api/file?type=data&id=${router.query.id}`
-      ).then(res => res.json())
+      ).then(res => res.json());
 
       if (response.error) {
-        setHasError(true)
+        setHasError(true);
       }
 
-      setFile(response)
-    }
+      setFile(response);
+    };
 
-    getFileInfo()
-  }, [router])
+    getFileInfo();
+  }, [router]);
 
   useEffect(() => {
     if (file && file.name) {
-      onLoad(file.name + ' | Download')
+      onLoad(file.name + ' | Download');
     }
-  }, [file, onLoad])
+  }, [file, onLoad]);
 
   if (hasError) {
-    onLoad('File not found')
+    onLoad('File not found');
 
-    return <div>File not found</div>
+    return <div>File not found</div>;
   }
 
   if (!file) {
-    return <Spinner />
+    return <Spinner />;
   }
 
   return (
@@ -58,5 +60,5 @@ export default function Download({ name, size, onLoad }) {
         Download
       </Button>
     </>
-  )
+  );
 }
