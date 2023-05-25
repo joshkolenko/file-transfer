@@ -5,6 +5,14 @@ const {
   ObjectId,
 } = require('mongodb');
 
+export const config = {
+  runtime: 'edge',
+  // api: {
+  //   responseLimit: false,
+  //   bodyParser: false,
+  // },
+};
+
 const fs = require('fs');
 const formidable = require('formidable');
 
@@ -88,10 +96,3 @@ export default async function handler(req, res) {
     }
   }
 }
-
-export const config = {
-  api: {
-    responseLimit: false,
-    bodyParser: false,
-  },
-};
